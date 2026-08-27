@@ -726,6 +726,17 @@ figure.mu-diagram-block .mu-diagram-preview {
     width: 100%;
 }
 
+/* The editable LaTeX source of an active math block wraps long lines —
+   including long unbroken tokens — instead of overflowing the block
+   horizontally, so a long formula stays readable while it is being typed.
+   (`pre` defaults to `white-space: pre`, which would let a long line run
+   off the right edge.) */
+figure.mu-active.mu-math-block pre.mu-math-container {
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
 figure.mu-math-block .mu-math-preview .katex-display {
     margin: 0;
     padding: 1em 0;

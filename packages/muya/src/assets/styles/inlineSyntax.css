@@ -247,6 +247,29 @@ div .mu-math-error,
     white-space: nowrap;
 }
 
+/* The KaTeX parse-reason detail is hidden in the compact inline label; it
+   only appears while the token is being edited (popup state), where it has
+   room to wrap under the label so the user can read what is wrong. */
+.mu-math > .mu-math-render .mu-math-error-detail {
+    display: none;
+}
+
+.mu-math:not(.mu-hide) > .mu-math-render.mu-math-error {
+    white-space: normal;
+}
+
+.mu-math:not(.mu-hide) > .mu-math-render .mu-math-error-detail {
+    display: block;
+    margin-top: 0.3em;
+
+    max-width: calc(var(--editor-area-width, 800px) - 120px);
+
+    font-size: 12px;
+    font-style: normal;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
 /* Block math shows the full KaTeX parse-error message, which can be long; wrap
    it within the block instead of overflowing horizontally (#2220). */
 .mu-math-preview .mu-math-error {
