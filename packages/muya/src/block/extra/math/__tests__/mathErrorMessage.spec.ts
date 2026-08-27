@@ -50,6 +50,17 @@ describe('#2220 — invalid math surfaces the KaTeX parse error, not a generic m
         expect(errorEl!.textContent ?? '').toContain('Invalid Mathematical Formula');
     });
 
+    it('inline math error embeds the parse reason in a .mu-math-error-detail element (shown in the editing popup)', () => {
+        const muya = bootMuya('$\\frac{1}{$\n');
+        const errorEl = muya.domNode.querySelector('.mu-math-error');
+        expect(errorEl).not.toBeNull();
+        // The detail is always in the DOM; CSS keeps it hidden in the compact
+        // inline label and reveals it while the token is being edited.
+        const detail = errorEl!.querySelector('.mu-math-error-detail');
+        expect(detail).not.toBeNull();
+        expect((detail!.textContent ?? '')).toMatch(/parse error/i);
+    });
+
     it('block math `$$\\frac{1}{$$` shows the parse reason in .mu-math-error', () => {
         const muya = bootMuya('$$\n\\frac{1}{\n$$\n');
         const errorEl = muya.domNode.querySelector('.mu-math-error');

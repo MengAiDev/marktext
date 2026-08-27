@@ -163,6 +163,7 @@ export const CLASS_NAMES = genUpper2LowerKeyHash([
     'MU_SELECTED',
     'MU_SOFT_LINE_BREAK',
     'MU_MATH_ERROR',
+    'MU_MATH_ERROR_DETAIL',
     'MU_MATH_MARKER',
     'MU_MATH_RENDER',
     'MU_MATH_TEXT',

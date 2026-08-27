@@ -63,9 +63,19 @@ export default function inlineMath(this: Renderer, {
             loadMathMap.set(key, mathVnode);
         }
         catch (err) {
-            mathVnode = `<${i18n.t('Invalid Mathematical Formula')}>`;
+            const message = err instanceof Error ? err.message : '';
+            // Inline math errors stay compact to keep the surrounding text
+            // baseline (#4100, inline-math-align). The compact label is shown
+            // in both states; the KaTeX parse reason is additionally exposed
+            // via the title (hover) and, while the token is being edited
+            // (popup state, `.mu-math:not(.mu-hide)`), as a visible detail
+            // line under the label so the user can see what is wrong.
+            const label = `<${i18n.t('Invalid Mathematical Formula')}>`;
+            mathVnode = message
+                ? [label, h(`span.${CLASS_NAMES.MU_MATH_ERROR_DETAIL}`, message)]
+                : [label];
             previewSelector += `.${CLASS_NAMES.MU_MATH_ERROR}`;
-            errorTitle = err instanceof Error ? err.message : '';
+            errorTitle = message;
         }
     }
 
