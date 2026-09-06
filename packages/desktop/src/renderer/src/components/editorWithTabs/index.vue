@@ -121,6 +121,10 @@ onBeforeUnmount(() => {
     flex: 1;
     overflow: hidden;
     position: relative;
+    /* The WYSIWYG editor uses z-index: -1 in source/preview mode to hide
+       itself; without a background here it bleeds through the transparent
+       CodeMirror pane once .container becomes the positioning ancestor. */
+    background: var(--editorBgColor);
   }
 }
 
