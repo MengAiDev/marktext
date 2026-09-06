@@ -294,6 +294,7 @@ class AppMenu {
 
       // all other menu items are set automatically
       updateMenuItem(oldMenu, newMenu, 'sourceCodeModeMenuItem')
+      updateMenuItem(oldMenu, newMenu, 'previewModeMenuItem')
       updateMenuItem(oldMenu, newMenu, 'typewriterModeMenuItem')
       updateMenuItem(oldMenu, newMenu, 'focusModeMenuItem')
       updateMenuItem(oldMenu, newMenu, 'sideBarMenuItem')
@@ -326,6 +327,7 @@ class AppMenu {
         if (!rebuilt) return
 
         updateMenuItem(oldMenu, rebuilt, 'sourceCodeModeMenuItem')
+        updateMenuItem(oldMenu, rebuilt, 'previewModeMenuItem')
         updateMenuItem(oldMenu, rebuilt, 'typewriterModeMenuItem')
         updateMenuItem(oldMenu, rebuilt, 'focusModeMenuItem')
         updateMenuItem(oldMenu, rebuilt, 'sideBarMenuItem')

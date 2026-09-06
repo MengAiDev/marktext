@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useEditorStore } from '@/store/editor'
 import { usePreferencesStore } from '@/store/preferences'
 import { findMarkdownHeadingLine, scrollSourceEditorToLine } from '@/util/sourceModeToc'
@@ -43,8 +43,11 @@ const commitTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 const viewDestroyed = ref(false)
 const tabId = ref<string | null>(null)
 
-const { theme, sourceCode } = storeToRefs(preferencesStore)
+const { theme, sourceCode, previewMode } = storeToRefs(preferencesStore)
 const { currentFile: currentTab } = storeToRefs(editorStore)
+
+// CodeMirror is the active editor in both Source Code and Preview modes.
+const isSourceEditorActive = computed(() => sourceCode.value || previewMode.value)
 
 const isValidMuyaIndexCursor = (cursor: unknown): cursor is MuyaIndexCursorLike => {
   const c = cursor as MuyaIndexCursorLike | null | undefined
@@ -187,7 +190,7 @@ const handleInvalidateImageCache = () => {
 }
 
 const handleSelectAll = () => {
-  if (!sourceCode.value) {
+  if (!isSourceEditorActive.value) {
     return
   }
 
@@ -206,7 +209,7 @@ const handleSelectAll = () => {
 }
 
 const handleUndo = () => {
-  if (!sourceCode.value) {
+  if (!isSourceEditorActive.value) {
     return
   }
 
@@ -216,7 +219,7 @@ const handleUndo = () => {
 }
 
 const handleRedo = () => {
-  if (!sourceCode.value) {
+  if (!isSourceEditorActive.value) {
     return
   }
 

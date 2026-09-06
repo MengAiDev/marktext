@@ -113,6 +113,7 @@ export interface PreferencesState {
   typewriter: boolean
   focus: boolean
   sourceCode: boolean
+  previewMode: boolean
 
   // ----- User config -----
   imageFolderPath: string
@@ -228,6 +229,7 @@ export const usePreferencesStore = defineStore('preferences', {
     typewriter: false, // typewriter mode
     focus: false,
     sourceCode: false, // source code mode
+    previewMode: false, // dual-pane source + live preview mode
 
     // user configration
     imageFolderPath: '',
@@ -268,7 +270,16 @@ export const usePreferencesStore = defineStore('preferences', {
 
     TOGGLE_VIEW_MODE(entryName: keyof PreferencesState | string): void {
       const target = this as unknown as Record<string, unknown>
-      target[entryName as string] = !target[entryName as string]
+      const newValue = !target[entryName as string]
+      target[entryName as string] = newValue
+
+      // Source Code and Preview Mode are mutually exclusive: both hide the
+      // WYSIWYG editor and occupy the same editing surface.
+      if (entryName === 'previewMode' && newValue) {
+        target.sourceCode = false
+      } else if (entryName === 'sourceCode' && newValue) {
+        target.previewMode = false
+      }
     },
 
     ASK_FOR_USER_PREFERENCE(): void {

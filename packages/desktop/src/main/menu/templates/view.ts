@@ -26,6 +26,16 @@ export default function(keybindings: Keybindings): MenuItemConstructorOptions {
       }
     },
     {
+      id: 'previewModeMenuItem',
+      label: t('menu.view.previewMode'),
+      accelerator: keybindings.getAccelerator('view.preview-mode') ?? undefined,
+      type: 'checkbox',
+      checked: false,
+      click(_item, focusedWindow) {
+        actions.togglePreviewMode(focusedWindow as BrowserWindow | undefined)
+      }
+    },
+    {
       id: 'typewriterModeMenuItem',
       label: t('menu.view.typewriterMode'),
       accelerator: keybindings.getAccelerator('view.typewriter-mode') ?? undefined,

@@ -588,6 +588,12 @@ const commands: CommandDescriptor[] = [
     }
   },
   {
+    id: 'view.preview-mode',
+    execute: async() => {
+      bus.emit('view:toggle-view-entry', 'previewMode')
+    }
+  },
+  {
     id: 'view.typewriter-mode',
     execute: async() => {
       focusEditorAndExecute(() => bus.emit('view:toggle-view-entry', 'typewriter'))
