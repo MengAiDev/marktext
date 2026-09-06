@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { parse, compileScript } from 'vue/compiler-sfc'
 import ts from 'typescript'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 // `handleImageAction` lives as a <script setup> closure in sourceCode.vue
 // (registered on the `image-action` bus during onMounted). The desktop unit
@@ -53,7 +53,7 @@ const loadComponent = (deps: Record<string, unknown>) => {
     '__deps',
     'exports',
     'module',
-    `const { _defineComponent, ref, watch, onMounted, onBeforeUnmount, nextTick,
+    `const { _defineComponent, ref, computed, watch, onMounted, onBeforeUnmount, nextTick,
       useEditorStore, usePreferencesStore, storeToRefs, codeMirror,
       setCursorAtFirstLine, setTextDirection, getWordCount, adjustCursor, bus,
       oneDarkThemes, railscastsThemes } = __deps
@@ -68,13 +68,14 @@ const loadComponent = (deps: Record<string, unknown>) => {
 const makeDeps = (over: Record<string, unknown> = {}) => ({
   _defineComponent: (o: unknown) => o,
   ref,
+  computed,
   watch: () => {},
   onMounted: () => {},
   onBeforeUnmount: () => {},
   nextTick: () => Promise.resolve(),
   useEditorStore: () => ({ LISTEN_FOR_CONTENT_CHANGE: () => {} }),
   usePreferencesStore: () => ({}),
-  storeToRefs: () => ({ theme: ref(''), sourceCode: ref(true), currentFile: ref(null) }),
+  storeToRefs: () => ({ theme: ref(''), sourceCode: ref(true), previewMode: ref(false), currentFile: ref(null) }),
   codeMirror: () => ({}),
   setCursorAtFirstLine: vi.fn(),
   setTextDirection: () => {},
