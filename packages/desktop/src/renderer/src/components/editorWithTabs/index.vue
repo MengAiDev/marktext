@@ -14,6 +14,7 @@
       />
       <div
         v-if="previewMode"
+        ref="splitRef"
         class="preview-split"
       >
         <div
@@ -21,6 +22,7 @@
           :style="{ width: splitRatio + '%' }"
         >
           <source-code
+            class="in-preview"
             :markdown="markdown"
             :muya-index-cursor="muyaIndexCursor"
             :text-direction="textDirection"
@@ -57,9 +59,6 @@ import TabNotifications from './notifications.vue'
 
 const props = defineProps<{
   markdown: string
-  // `cursor` originates as `IFileState.cursor` which is `unknown`
-  // (see src/shared/types/files.ts); align here instead of forcing every
-  // caller to widen.
   cursor: unknown
   muyaIndexCursor?: unknown
   sourceCode: boolean
@@ -77,6 +76,7 @@ const editorHidden = computed(() => props.sourceCode || props.previewMode)
 
 // Percentage of width allocated to the source-code pane in preview mode.
 const splitRatio = ref(50)
+const splitRef = ref<HTMLElement | null>(null)
 const dragging = ref(false)
 
 const startDrag = (e: MouseEvent): void => {
@@ -87,10 +87,8 @@ const startDrag = (e: MouseEvent): void => {
 }
 
 const onDrag = (e: MouseEvent): void => {
-  if (!dragging.value) return
-  const container = (e.currentTarget as HTMLElement)?.closest('.preview-split')
-  if (!container) return
-  const rect = container.getBoundingClientRect()
+  if (!dragging.value || !splitRef.value) return
+  const rect = splitRef.value.getBoundingClientRect()
   const ratio = ((e.clientX - rect.left) / rect.width) * 100
   splitRatio.value = Math.min(85, Math.max(15, ratio))
 }
@@ -120,23 +118,18 @@ onBeforeUnmount(() => {
   & > .container {
     flex: 1;
     overflow: hidden;
-    position: relative;
-    /* The WYSIWYG editor uses z-index: -1 in source/preview mode to hide
-       itself; without a background here it bleeds through the transparent
-       CodeMirror pane once .container becomes the positioning ancestor. */
-    background: var(--editorBgColor);
+    /* Intentionally NOT position:relative — the WYSIWYG editor relies on
+       resolving its z-index:-1 against .editor-with-tabs (which has a solid
+       background) so it is fully hidden in source/preview mode. */
   }
 }
 
+/* In preview mode the WYSIWYG editor is position:absolute (out of flow),
+   so this block fills the entire container height. */
 .preview-split {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  height: 100%;
   display: flex;
   flex-direction: row;
-  z-index: 1;
 }
 
 .split-pane {
@@ -146,6 +139,12 @@ onBeforeUnmount(() => {
 
 .split-source {
   flex-shrink: 0;
+}
+
+/* In preview mode the source editor lives inside a split pane; override its
+   viewport-based height so it fills the pane and scrolls correctly. */
+.split-source :deep(.source-code.in-preview) {
+  height: 100%;
 }
 
 .split-preview {
