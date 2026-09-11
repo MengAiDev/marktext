@@ -124,12 +124,16 @@ onBeforeUnmount(() => {
   }
 }
 
-/* In preview mode the WYSIWYG editor is position:absolute (out of flow),
-   so this block fills the entire container height. */
+/* In preview mode the WYSIWYG editor is position:absolute with z-index:-1.
+   It paints BELOW in-flow content but ABOVE the root background — so any
+   transparent gap in our panes (CodeMirror's transparent background, margins)
+   lets Muya's content bleed through. Give the whole split an opaque background
+   so it fully covers the hidden WYSIWYG layer. */
 .preview-split {
   height: 100%;
   display: flex;
   flex-direction: row;
+  background: var(--editorBgColor);
 }
 
 .split-pane {
