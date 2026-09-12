@@ -51,6 +51,10 @@ export const toggleSourceCodeMode = (win: Win): void => {
   toggleTypeMode(win, 'sourceCode')
 }
 
+export const togglePreviewMode = (win: Win): void => {
+  toggleTypeMode(win, 'preview')
+}
+
 export const toggleSidebar = (win: Win): void => {
   toggleLayout(win, 'showSideBar')
 }
@@ -128,6 +132,9 @@ export const viewLayoutChanged = (
         changeMenuByName('sourceCodeModeMenuItem', !!value)
         disableMenuByName(focusModeMenuItemId, !value)
         disableMenuByName(typewriterModeMenuItemId, !value)
+        break
+      case 'preview':
+        changeMenuByName('previewModeMenuItem', !!value)
         break
       case 'typewriter':
         changeMenuByName(typewriterModeMenuItemId, value)

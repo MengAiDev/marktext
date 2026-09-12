@@ -11,8 +11,19 @@
         :text-direction="textDirection"
         :platform="platform"
       />
+      <div
+        v-if="preview"
+        class="preview-split"
+      >
+        <source-code
+          :markdown="markdown"
+          :muya-index-cursor="muyaIndexCursor"
+          :text-direction="textDirection"
+        />
+        <preview-pane :markdown="markdown" />
+      </div>
       <source-code
-        v-if="sourceCode"
+        v-else-if="sourceCode"
         :markdown="markdown"
         :muya-index-cursor="muyaIndexCursor"
         :text-direction="textDirection"
@@ -28,6 +39,7 @@ import { storeToRefs } from 'pinia'
 import Tabs from './tabs.vue'
 import Editor from './editor.vue'
 import SourceCode from './sourceCode.vue'
+import PreviewPane from './previewPane.vue'
 import TabNotifications from './notifications.vue'
 
 defineProps<{
@@ -38,6 +50,7 @@ defineProps<{
   cursor: unknown
   muyaIndexCursor?: unknown
   sourceCode: boolean
+  preview: boolean
   showTabBar: boolean
   textDirection: string
   platform: string
@@ -59,6 +72,20 @@ const { effectiveSideBarWidth } = storeToRefs(useLayoutStore())
   & > .container {
     flex: 1;
     overflow: hidden;
+  }
+  & > .container > .preview-split {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    // The CodeMirror pane (root of <source-code>) must take the left half;
+    // <preview-pane> already flexes to fill the right half.
+    & > :deep(.source-code) {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+    }
   }
 }
 </style>

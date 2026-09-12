@@ -46,6 +46,15 @@ export default function(keybindings: Keybindings): MenuItemConstructorOptions {
       }
     },
     {
+      id: 'previewModeMenuItem',
+      label: t('menu.view.previewMode'),
+      type: 'checkbox',
+      checked: false,
+      click(_item, focusedWindow) {
+        actions.togglePreviewMode(focusedWindow as BrowserWindow | undefined)
+      }
+    },
+    {
       type: 'separator'
     },
     {

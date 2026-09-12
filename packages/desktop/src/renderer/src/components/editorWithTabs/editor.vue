@@ -1,7 +1,7 @@
 <template>
   <div
     class="editor-wrapper"
-    :class="[{ typewriter: typewriter, focus: focus, source: sourceCode }]"
+    :class="[{ typewriter: typewriter, focus: focus, source: sourceMode }]"
     :dir="textDirection"
   >
     <div
@@ -72,12 +72,12 @@
         </div>
       </template>
     </el-dialog>
-    <editor-search v-if="!sourceCode" />
+    <editor-search v-if="!sourceMode" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted, onBeforeUnmount, nextTick, markRaw } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick, markRaw } from 'vue'
 import log from 'electron-log'
 import {
   Muya,
@@ -249,8 +249,14 @@ const {
   // Edit modes
   typewriter,
   focus,
-  sourceCode
+  sourceCode,
+  preview
 } = storeToRefs(preferencesStore)
+
+// `sourceCode` (full source view) and `preview` (split source + live preview)
+// both make CodeMirror the active editing surface and hide the WYSIWYG engine.
+// Treat them as a single "editing source" state for the guards below.
+const sourceMode = computed(() => sourceCode.value || preview.value)
 
 // Editor store refs
 const { currentFile, tabs } = storeToRefs(editorStore)
@@ -550,7 +556,7 @@ watch(focus, (value) => {
 // WYSIWYG engine, so grey them out. On return to WYSIWYG, re-apply the menu
 // state for the CURRENT cursor context (a code block/table still disables some
 // items) rather than blanket-enabling everything (#3531).
-watch(sourceCode, (isSource) => {
+watch(sourceMode, (isSource) => {
   const windowId = window.marktext?.env?.windowId ?? -1
   if (isSource) {
     window.electron.ipcRenderer.send('mt::set-editor-format-menus-enabled', windowId, false)
@@ -813,7 +819,7 @@ watch(currentFile, (value, oldValue) => {
 })
 
 watch(
-  sourceCode,
+  sourceMode,
   (value, oldValue) => {
     if (value && value !== oldValue) {
       if (editor.value) {
@@ -970,7 +976,7 @@ const imageAction = async (
     }
   }
 
-  if (id && sourceCode.value) {
+  if (id && sourceMode.value) {
     bus.emit('image-action', {
       id,
       result: destImagePath,
@@ -1063,7 +1069,7 @@ const replaceMisspelling = (payload: unknown) => {
 }
 
 const handleUndo = () => {
-  if (sourceCode.value) {
+  if (sourceMode.value) {
     return
   }
 
@@ -1073,7 +1079,7 @@ const handleUndo = () => {
 }
 
 const handleRedo = () => {
-  if (sourceCode.value) {
+  if (sourceMode.value) {
     return
   }
 
@@ -1083,7 +1089,7 @@ const handleRedo = () => {
 }
 
 const handleSelectAll = () => {
-  if (sourceCode.value) {
+  if (sourceMode.value) {
     return
   }
 
@@ -1118,7 +1124,7 @@ const handleCopyPaste = (type: unknown) => {
 }
 
 const insertImage = (src: unknown) => {
-  if (!sourceCode.value) {
+  if (!sourceMode.value) {
     editor.value && editor.value.insertImage({ src })
   }
 }
@@ -1393,7 +1399,7 @@ const handleEditParagraph = (type: unknown) => {
   // These commands act on the hidden WYSIWYG engine, so block them in
   // source-code mode (mirrors handleUndo/handleSelectAll) — otherwise e.g. the
   // Insert Table wizard opens and writes to the invisible editor (#3531).
-  if (sourceCode.value) {
+  if (sourceMode.value) {
     return
   }
   if (type === 'table') {
@@ -1416,7 +1422,7 @@ const handleEditParagraph = (type: unknown) => {
 
 // handle `duplicate`, `delete`, `create paragraph below`
 const handleParagraph = (type: unknown) => {
-  if (sourceCode.value) {
+  if (sourceMode.value) {
     return
   }
   if (editor.value) {
@@ -1437,7 +1443,7 @@ const handleParagraph = (type: unknown) => {
 }
 
 const handleInlineFormat = (type: unknown) => {
-  if (sourceCode.value) {
+  if (sourceMode.value) {
     return
   }
   editor.value && editor.value.format(type)
