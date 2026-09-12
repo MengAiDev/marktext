@@ -113,6 +113,8 @@ export interface PreferencesState {
   typewriter: boolean
   focus: boolean
   sourceCode: boolean
+  // Side-by-side source editor + live HTML preview (VSCode-style split preview).
+  preview: boolean
 
   // ----- User config -----
   imageFolderPath: string
@@ -133,7 +135,7 @@ interface SetUserDataPayload {
 }
 
 interface ModeTogglePayload {
-  type: keyof PreferencesState | 'typewriter' | 'focus' | 'sourceCode'
+  type: keyof PreferencesState | 'typewriter' | 'focus' | 'sourceCode' | 'preview'
   checked: boolean
 }
 
@@ -228,6 +230,7 @@ export const usePreferencesStore = defineStore('preferences', {
     typewriter: false, // typewriter mode
     focus: false,
     sourceCode: false, // source code mode
+    preview: false, // split source + live preview mode
 
     // user configration
     imageFolderPath: '',

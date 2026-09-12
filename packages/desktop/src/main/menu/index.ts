@@ -296,6 +296,7 @@ class AppMenu {
       updateMenuItem(oldMenu, newMenu, 'sourceCodeModeMenuItem')
       updateMenuItem(oldMenu, newMenu, 'typewriterModeMenuItem')
       updateMenuItem(oldMenu, newMenu, 'focusModeMenuItem')
+      updateMenuItem(oldMenu, newMenu, 'previewModeMenuItem')
       updateMenuItem(oldMenu, newMenu, 'sideBarMenuItem')
       updateMenuItem(oldMenu, newMenu, 'tabBarMenuItem')
 
@@ -328,6 +329,7 @@ class AppMenu {
         updateMenuItem(oldMenu, rebuilt, 'sourceCodeModeMenuItem')
         updateMenuItem(oldMenu, rebuilt, 'typewriterModeMenuItem')
         updateMenuItem(oldMenu, rebuilt, 'focusModeMenuItem')
+        updateMenuItem(oldMenu, rebuilt, 'previewModeMenuItem')
         updateMenuItem(oldMenu, rebuilt, 'sideBarMenuItem')
         updateMenuItem(oldMenu, rebuilt, 'tabBarMenuItem')
         newMenu = rebuilt

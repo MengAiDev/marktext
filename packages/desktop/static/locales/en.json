@@ -116,6 +116,7 @@
       "sourceCodeMode": "Source Code Mode",
       "typewriterMode": "Typewriter Mode",
       "focusMode": "Focus Mode",
+      "previewMode": "Preview Mode",
       "toggleTableOfContents": "Toggle Table of Contents",
       "reloadImages": "Reload Images",
       "showDeveloperTools": "Show Developer Tools",

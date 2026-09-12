@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, watch, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useEditorStore } from '@/store/editor'
 import { usePreferencesStore } from '@/store/preferences'
 import { findMarkdownHeadingLine, scrollSourceEditorToLine } from '@/util/sourceModeToc'
@@ -43,7 +43,10 @@ const commitTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 const viewDestroyed = ref(false)
 const tabId = ref<string | null>(null)
 
-const { theme, sourceCode } = storeToRefs(preferencesStore)
+const { theme, sourceCode, preview } = storeToRefs(preferencesStore)
+// CodeMirror is the active editor in full source mode AND in split preview
+// mode; gate the bus handlers on either flag.
+const codeMirrorActive = computed(() => sourceCode.value || preview.value)
 const { currentFile: currentTab } = storeToRefs(editorStore)
 
 const isValidMuyaIndexCursor = (cursor: unknown): cursor is MuyaIndexCursorLike => {
@@ -187,7 +190,7 @@ const handleInvalidateImageCache = () => {
 }
 
 const handleSelectAll = () => {
-  if (!sourceCode.value) {
+  if (!codeMirrorActive.value) {
     return
   }
 
@@ -206,7 +209,7 @@ const handleSelectAll = () => {
 }
 
 const handleUndo = () => {
-  if (!sourceCode.value) {
+  if (!codeMirrorActive.value) {
     return
   }
 
@@ -216,7 +219,7 @@ const handleUndo = () => {
 }
 
 const handleRedo = () => {
-  if (!sourceCode.value) {
+  if (!codeMirrorActive.value) {
     return
   }
 
