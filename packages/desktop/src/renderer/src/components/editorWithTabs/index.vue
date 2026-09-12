@@ -13,12 +13,23 @@
       />
       <div
         v-if="preview"
+        ref="splitRef"
         class="preview-split"
       >
-        <source-code
-          :markdown="markdown"
-          :muya-index-cursor="muyaIndexCursor"
-          :text-direction="textDirection"
+        <div
+          class="source-pane"
+          :style="{ flexBasis: leftPercent + '%' }"
+        >
+          <source-code
+            :markdown="markdown"
+            :muya-index-cursor="muyaIndexCursor"
+            :text-direction="textDirection"
+          />
+        </div>
+        <div
+          class="preview-splitter"
+          title="Drag to resize"
+          @mousedown.prevent="onSplitterMouseDown"
         />
         <preview-pane :markdown="markdown" />
       </div>
@@ -34,6 +45,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onBeforeUnmount } from 'vue'
 import { useLayoutStore } from '@/store/layout'
 import { storeToRefs } from 'pinia'
 import Tabs from './tabs.vue'
@@ -57,6 +69,45 @@ defineProps<{
 }>()
 
 const { effectiveSideBarWidth } = storeToRefs(useLayoutStore())
+
+// Draggable splitter between the source editor and the live preview. The left
+// (source) pane width is expressed as a percentage of the split container and
+// clamped so neither pane collapses to unusable.
+const splitRef = ref<HTMLElement | null>(null)
+const leftPercent = ref(50)
+const MIN_PCT = 20
+const MAX_PCT = 80
+
+let dragging = false
+
+const onDrag = (event: MouseEvent): void => {
+  if (!dragging || !splitRef.value) return
+  const rect = splitRef.value.getBoundingClientRect()
+  const pct = ((event.clientX - rect.left) / rect.width) * 100
+  leftPercent.value = Math.min(MAX_PCT, Math.max(MIN_PCT, pct))
+}
+
+const stopDrag = (): void => {
+  if (!dragging) return
+  dragging = false
+  window.removeEventListener('mousemove', onDrag)
+  window.removeEventListener('mouseup', stopDrag)
+  document.body.classList.remove('preview-dragging')
+}
+
+const onSplitterMouseDown = (event: MouseEvent): void => {
+  event.preventDefault()
+  dragging = true
+  document.body.classList.add('preview-dragging')
+  window.addEventListener('mousemove', onDrag)
+  window.addEventListener('mouseup', stopDrag)
+}
+
+onBeforeUnmount(() => {
+  window.removeEventListener('mousemove', onDrag)
+  window.removeEventListener('mouseup', stopDrag)
+  document.body.classList.remove('preview-dragging')
+})
 </script>
 
 <style scoped>
@@ -79,13 +130,35 @@ const { effectiveSideBarWidth } = storeToRefs(useLayoutStore())
     width: 100%;
     height: 100%;
     overflow: hidden;
-    /* The CodeMirror pane (root of <source-code>) must take the left half;
-       <preview-pane> already flexes to fill the right half. */
-    & > :deep(.source-code) {
-      flex: 1;
+    /* The source pane sizes to `leftPercent` (inline flex-basis); the preview
+       pane flexes to fill the remainder. */
+    & > .source-pane {
+      flex: 0 0 auto;
       min-width: 0;
       height: 100%;
     }
+    & > :deep(.source-code) {
+      height: 100%;
+    }
+    & > .preview-splitter {
+      flex: 0 0 5px;
+      cursor: col-resize;
+      background: var(--editorColor50, #e6e6e6);
+      &:hover,
+      &:active {
+        background: var(--editorColor, #c8c8c8);
+      }
+    }
   }
+}
+</style>
+
+<style>
+/* While dragging the splitter, suppress text selection / I-beam over the
+   panes. Body-level (not scoped) so it also covers CodeMirror. */
+body.preview-dragging,
+body.preview-dragging * {
+  cursor: col-resize !important;
+  user-select: none !important;
 }
 </style>

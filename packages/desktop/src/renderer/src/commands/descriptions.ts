@@ -171,6 +171,7 @@ const COMMAND_KEY_MAP: Record<string, string> = {
   'view.typewriter-mode': 'commands.view.typewriterMode',
   'view.toggle-focus-mode': 'commands.view.toggleFocusMode',
   'view.focus-mode': 'commands.view.focusMode',
+  'view.preview-mode': 'commands.view.togglePreviewMode',
 
   // View features
   'view.command-palette': 'commands.view.commandPalette',

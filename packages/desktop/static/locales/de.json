@@ -119,7 +119,8 @@
       "toggleTableOfContents": "Inhaltsverzeichnis umschalten",
       "reloadImages": "Bilder neu laden",
       "showDeveloperTools": "Entwicklertools anzeigen",
-      "reloadWindow": "Fenster neu laden"
+      "reloadWindow": "Fenster neu laden",
+      "previewMode": "Vorschaumodus"
     },
     "format": {
       "format": "Format",
@@ -845,7 +846,8 @@
       "reloadImages": "Bilder neu laden",
       "textDirection": "Textrichtung",
       "actualSize": "Tatsächliche Größe",
-      "devToggleDeveloperTools": "Entwicklertools umschalten"
+      "devToggleDeveloperTools": "Entwicklertools umschalten",
+      "togglePreviewMode": "Vorschaumodus umschalten"
     },
     "tabs": {
       "cycleForward": "Vorwärts wechseln",
