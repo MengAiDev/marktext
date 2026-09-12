@@ -41,7 +41,7 @@ let disposed = false
 const EMPTY_DOC =
   '<!DOCTYPE html><html><body style="font-family:sans-serif;padding:24px;color:#9a9a9a;"></body></html>'
 
-const render = async(md: string): Promise<void> => {
+const render = async (md: string): Promise<void> => {
   const token = ++renderToken
   try {
     const doc = await new MarkdownToHtml(md).generate({

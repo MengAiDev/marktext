@@ -230,7 +230,7 @@ export const usePreferencesStore = defineStore('preferences', {
     typewriter: false, // typewriter mode
     focus: false,
     sourceCode: false, // source code mode
-    preview: false // split source + live preview mode
+    preview: false, // split source + live preview mode
 
     // user configration
     imageFolderPath: '',
