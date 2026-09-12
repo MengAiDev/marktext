@@ -79,8 +79,8 @@ const { effectiveSideBarWidth } = storeToRefs(useLayoutStore())
     width: 100%;
     height: 100%;
     overflow: hidden;
-    // The CodeMirror pane (root of <source-code>) must take the left half;
-    // <preview-pane> already flexes to fill the right half.
+    /* The CodeMirror pane (root of <source-code>) must take the left half;
+       <preview-pane> already flexes to fill the right half. */
     & > :deep(.source-code) {
       flex: 1;
       min-width: 0;
