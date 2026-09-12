@@ -49,13 +49,32 @@ const render = async (md: string): Promise<void> => {
     })
     if (disposed || token !== renderToken) return
     const frame = frameRef.value
-    if (frame) frame.srcdoc = doc
+    if (frame) applySrcdoc(frame, doc)
   } catch (err) {
     if (disposed || token !== renderToken) return
     console.error('Preview render failed:', err)
     const frame = frameRef.value
-    if (frame) frame.srcdoc = EMPTY_DOC
+    if (frame) applySrcdoc(frame, EMPTY_DOC)
   }
+}
+
+// Rewriting `srcdoc` replaces the iframe document, which always resets the
+// scroll position to the top. To keep the reader anchored where they were,
+// snapshot the current scrollY right before the swap, then restore it once the
+// new document has finished loading. The iframe is `allow-same-origin`, so
+// `contentWindow` is reachable without `allow-scripts`.
+const applySrcdoc = (frame: HTMLIFrameElement, doc: string): void => {
+  const win = frame.contentWindow
+  const scrollTop = win ? win.scrollY : 0
+
+  const onLoad = (): void => {
+    frame.removeEventListener('load', onLoad)
+    const restored = frame.contentWindow
+    if (restored) restored.scrollTo(0, scrollTop)
+  }
+  frame.addEventListener('load', onLoad)
+
+  frame.srcdoc = doc
 }
 
 const scheduleRender = (md: string): void => {
