@@ -838,6 +838,7 @@
       "toggleSourceCodeMode": "Toggle Source Code Mode",
       "toggleTypewriterMode": "Toggle Typewriter Mode",
       "toggleFocusMode": "Toggle Focus Mode",
+      "togglePreviewMode": "Toggle Preview Mode",
       "toggleSidebar": "Toggle Sidebar",
       "toggleToc": "Toggle Table of Contents",
       "toggleTabbar": "Toggle Tab Bar",

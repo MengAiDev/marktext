@@ -119,7 +119,8 @@
       "toggleTableOfContents": "切換目錄",
       "reloadImages": "重新載入圖片",
       "showDeveloperTools": "顯示開發者工具",
-      "reloadWindow": "重新載入視窗"
+      "reloadWindow": "重新載入視窗",
+      "previewMode": "預覽模式"
     },
     "format": {
       "format": "格式",
@@ -845,7 +846,8 @@
       "reloadImages": "重新載入圖片",
       "textDirection": "文字方向",
       "actualSize": "實際大小",
-      "devToggleDeveloperTools": "切換開發者工具"
+      "devToggleDeveloperTools": "切換開發者工具",
+      "togglePreviewMode": "切換預覽模式"
     },
     "tabs": {
       "cycleForward": "向前循環",
