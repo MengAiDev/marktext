@@ -119,7 +119,8 @@
       "toggleTableOfContents": "İçindekileri Aç/Kapat",
       "reloadImages": "Görselleri Yeniden Yükle",
       "showDeveloperTools": "Geliştirici Araçlarını Göster",
-      "reloadWindow": "Pencereyi Yeniden Yükle"
+      "reloadWindow": "Pencereyi Yeniden Yükle",
+      "previewMode": "Önizleme Modu"
     },
     "format": {
       "format": "Biçim",
@@ -845,7 +846,8 @@
       "reloadImages": "Görselleri Yeniden Yükle",
       "textDirection": "Metin Yönü",
       "actualSize": "Gerçek Boyut",
-      "devToggleDeveloperTools": "Geliştirici Araçlarını Aç/Kapat"
+      "devToggleDeveloperTools": "Geliştirici Araçlarını Aç/Kapat",
+      "togglePreviewMode": "Önizleme Modunu Değiştir"
     },
     "tabs": {
       "cycleForward": "İleri Geç",

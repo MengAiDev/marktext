@@ -119,7 +119,8 @@
       "toggleTableOfContents": "목차 토글",
       "reloadImages": "이미지 새로고침",
       "showDeveloperTools": "개발자 도구 보기",
-      "reloadWindow": "창 새로고침"
+      "reloadWindow": "창 새로고침",
+      "previewMode": "미리보기 모드"
     },
     "format": {
       "format": "서식",
@@ -845,7 +846,8 @@
       "reloadImages": "이미지 새로고침",
       "textDirection": "텍스트 방향",
       "actualSize": "실제 크기",
-      "devToggleDeveloperTools": "개발자 도구 전환"
+      "devToggleDeveloperTools": "개발자 도구 전환",
+      "togglePreviewMode": "미리보기 모드 전환"
     },
     "tabs": {
       "cycleForward": "앞으로 순환",

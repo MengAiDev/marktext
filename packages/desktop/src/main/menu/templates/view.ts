@@ -48,6 +48,7 @@ export default function(keybindings: Keybindings): MenuItemConstructorOptions {
     {
       id: 'previewModeMenuItem',
       label: t('menu.view.previewMode'),
+      accelerator: keybindings.getAccelerator('view.preview-mode') ?? undefined,
       type: 'checkbox',
       checked: false,
       click(_item, focusedWindow) {
