@@ -196,6 +196,20 @@ export const clickMenuById = async(app: ElectronApplication, id: string): Promis
   }, id)
 }
 
+// Split preview is the app default. The suite was written against the WYSIWYG
+// baseline, so turn preview off right after launch unless a spec opts in.
+export const disablePreviewMode = async(
+  page: Page,
+  app: ElectronApplication
+): Promise<void> => {
+  const hasPreview = await page.evaluate(() => !!document.querySelector('.preview-split'))
+  if (!hasPreview) return
+  await clickMenuById(app, 'previewModeMenuItem')
+  await page.waitForFunction(() => !document.querySelector('.preview-split'), null, {
+    timeout: 10000
+  })
+}
+
 export const waitForEditor = async(page: Page, timeout = 15000): Promise<void> => {
   await page.waitForSelector('.editor-component', { state: 'attached', timeout })
   await page.waitForFunction(
@@ -208,8 +222,13 @@ export const waitForEditor = async(page: Page, timeout = 15000): Promise<void> =
   )
 }
 
+// Split preview mounts a CodeMirror pane too, so "CodeMirror exists" is not a
+// reliable full-source-mode check. Full source mode has no `.preview-split`.
+const isFullSourceMode = (): boolean =>
+  !!document.querySelector('.source-code .CodeMirror') && !document.querySelector('.preview-split')
+
 export const enterSourceMode = async(page: Page, app: ElectronApplication): Promise<void> => {
-  const already = await page.evaluate(() => !!document.querySelector('.source-code .CodeMirror'))
+  const already = await page.evaluate(isFullSourceMode)
   if (already) return
   await clickMenuById(app, 'sourceCodeModeMenuItem')
   await page.waitForSelector('.source-code .CodeMirror', { state: 'attached', timeout: 10000 })
@@ -226,7 +245,7 @@ export const enterSourceMode = async(page: Page, app: ElectronApplication): Prom
 }
 
 export const exitSourceMode = async(page: Page, app: ElectronApplication): Promise<void> => {
-  const inSource = await page.evaluate(() => !!document.querySelector('.source-code .CodeMirror'))
+  const inSource = await page.evaluate(isFullSourceMode)
   if (!inSource) return
   await clickMenuById(app, 'sourceCodeModeMenuItem')
   await page.waitForFunction(() => !document.querySelector('.source-code'), null, {
@@ -334,6 +353,7 @@ export const launchWithDoc = async(
   const { app, page } = await launchElectron([relativeFixture], options)
   await waitForEditor(page)
   await waitForMenuReady(app)
+  await disablePreviewMode(page, app)
   return { app, page }
 }
 
@@ -349,6 +369,7 @@ export const launchWithMarkdown = async(
   const { app, page } = await launchElectron([filePath], options)
   await waitForEditor(page)
   await waitForMenuReady(app)
+  await disablePreviewMode(page, app)
   return { app, page, filePath }
 }
 
