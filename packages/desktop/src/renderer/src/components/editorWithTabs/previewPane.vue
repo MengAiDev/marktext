@@ -31,15 +31,30 @@ const frameRef = ref<HTMLIFrameElement | null>(null)
 
 // Debounce re-renders while typing: `MarkdownToHtml.generate` re-runs the full
 // marked + diagram pipeline and re-inline the stylesheet every call, so we
-// coalesce rapid keystrokes. `renderToken` drops stale async results after a
-// newer render has been scheduled.
+// coalesce rapid keystrokes. `renderToken` drops stale async results as soon as
+// the source changes, before the debounced re-render even starts.
 const RENDER_DEBOUNCE_MS = 250
 let renderTimer: ReturnType<typeof setTimeout> | null = null
 let renderToken = 0
 let disposed = false
+// Load handler installed by the last `srcdoc` swap. It must be detached before
+// the next swap, otherwise scroll restores from older documents fire against
+// newer content.
+let srcdocLoadHandler: (() => void) | null = null
 
 const EMPTY_DOC =
   '<!DOCTYPE html><html><body style="font-family:sans-serif;padding:24px;color:#9a9a9a;"></body></html>'
+
+// Cancel the queued render and invalidate any async render still in flight.
+// The token is bumped synchronously so a previous document can never paint
+// over the content that is being displayed now.
+const invalidateRender = (): void => {
+  if (renderTimer) {
+    clearTimeout(renderTimer)
+    renderTimer = null
+  }
+  ++renderToken
+}
 
 const render = async (md: string): Promise<void> => {
   const token = ++renderToken
@@ -64,22 +79,30 @@ const render = async (md: string): Promise<void> => {
 // new document has finished loading. The iframe is `allow-same-origin`, so
 // `contentWindow` is reachable without `allow-scripts`.
 const applySrcdoc = (frame: HTMLIFrameElement, doc: string): void => {
+  if (srcdocLoadHandler) {
+    frame.removeEventListener('load', srcdocLoadHandler)
+    srcdocLoadHandler = null
+  }
+
   const win = frame.contentWindow
   const scrollTop = win ? win.scrollY : 0
 
   const onLoad = (): void => {
     frame.removeEventListener('load', onLoad)
+    if (srcdocLoadHandler === onLoad) srcdocLoadHandler = null
     const restored = frame.contentWindow
     if (restored) restored.scrollTo(0, scrollTop)
   }
+  srcdocLoadHandler = onLoad
   frame.addEventListener('load', onLoad)
 
   frame.srcdoc = doc
 }
 
 const scheduleRender = (md: string): void => {
-  if (renderTimer) clearTimeout(renderTimer)
+  invalidateRender()
   renderTimer = setTimeout(() => {
+    renderTimer = null
     render(md)
   }, RENDER_DEBOUNCE_MS)
 }
@@ -97,7 +120,12 @@ watch(
 
 onBeforeUnmount(() => {
   disposed = true
-  if (renderTimer) clearTimeout(renderTimer)
+  invalidateRender()
+  const frame = frameRef.value
+  if (frame && srcdocLoadHandler) {
+    frame.removeEventListener('load', srcdocLoadHandler)
+    srcdocLoadHandler = null
+  }
 })
 </script>
 

@@ -21,6 +21,7 @@
       <editor-with-tabs
         v-if="hasCurrentFile && init"
         :markdown="markdown"
+        :file-id="currentFile?.id"
         :cursor="cursor"
         :muya-index-cursor="muyaIndexCursor"
         :source-code="sourceCode"

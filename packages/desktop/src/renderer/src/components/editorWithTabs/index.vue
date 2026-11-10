@@ -31,7 +31,7 @@
           title="Drag to resize"
           @mousedown.prevent="onSplitterMouseDown"
         />
-        <preview-pane :markdown="markdown" />
+        <preview-pane :key="fileId" :markdown="markdown" />
       </div>
       <source-code
         v-else-if="sourceCode"
@@ -56,6 +56,9 @@ import TabNotifications from './notifications.vue'
 
 defineProps<{
   markdown: string
+  // Active document id. Bound as the preview pane's key so switching documents
+  // remounts the iframe instead of showing the previous document's HTML.
+  fileId?: string
   // `cursor` originates as `IFileState.cursor` which is `unknown`
   // (see src/shared/types/files.ts); align here instead of forcing every
   // caller to widen.
