@@ -208,6 +208,8 @@ export const disablePreviewMode = async(
   await page.waitForFunction(() => !document.querySelector('.preview-split'), null, {
     timeout: 10000
   })
+  // Let the source-pane handoff settle before specs start typing.
+  await page.waitForTimeout(150)
 }
 
 export const waitForEditor = async(page: Page, timeout = 15000): Promise<void> => {
