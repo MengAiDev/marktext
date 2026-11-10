@@ -555,21 +555,26 @@ watch(focus, (value) => {
 // In source-code mode the Paragraph and Format menus operate on the hidden
 // WYSIWYG engine, so grey them out. On return to WYSIWYG, re-apply the menu
 // state for the CURRENT cursor context (a code block/table still disables some
-// items) rather than blanket-enabling everything (#3531).
-watch(sourceMode, (isSource) => {
-  const windowId = window.marktext?.env?.windowId ?? -1
-  if (isSource) {
-    window.electron.ipcRenderer.send('mt::set-editor-format-menus-enabled', windowId, false)
-    return
-  }
-  nextTick(() => {
-    if (selectionChange.value) {
-      pushSelectionMenuState(selectionChange.value as MuyaChange)
-    } else {
-      window.electron.ipcRenderer.send('mt::set-editor-format-menus-enabled', windowId, true)
+// items) rather than blanket-enabling everything (#3531). `immediate` keeps the
+// menu in sync when a window starts directly in preview/source-code mode.
+watch(
+  sourceMode,
+  (isSource) => {
+    const windowId = window.marktext?.env?.windowId ?? -1
+    if (isSource) {
+      window.electron.ipcRenderer.send('mt::set-editor-format-menus-enabled', windowId, false)
+      return
     }
-  })
-})
+    nextTick(() => {
+      if (selectionChange.value) {
+        pushSelectionMenuState(selectionChange.value as MuyaChange)
+      } else {
+        window.electron.ipcRenderer.send('mt::set-editor-format-menus-enabled', windowId, true)
+      }
+    })
+  },
+  { immediate: true }
+)
 
 watch(fontSize, (value, oldValue) => {
   if (value !== oldValue && editor.value) {

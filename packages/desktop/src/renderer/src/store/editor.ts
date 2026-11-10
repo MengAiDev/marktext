@@ -906,10 +906,13 @@ export const useEditorStore = defineStore('editor', {
           showTabBar: !!tabBarVisibility
         })
         layoutStore.DISPATCH_LAYOUT_MENU_ITEMS()
-        preferencesStore.SET_MODE({
-          type: 'sourceCode',
-          checked: !!sourceCodeModeEnabled
-        })
+        const openInSourceCode = !!sourceCodeModeEnabled
+        preferencesStore.SET_MODE({ type: 'sourceCode', checked: openInSourceCode })
+        // Split preview is the default display mode. Clear it when the window
+        // is configured to start in full source-code mode.
+        preferencesStore.SET_MODE({ type: 'preview', checked: !openInSourceCode })
+        // Mirror the initial preview state into the View menu checkbox.
+        preferencesStore.DISPATCH_EDITOR_VIEW_STATE({ preview: !openInSourceCode })
 
         if (addBlankTab) {
           this.NEW_UNTITLED_TAB({ selected: true })

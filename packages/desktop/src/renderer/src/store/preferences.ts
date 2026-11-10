@@ -230,7 +230,8 @@ export const usePreferencesStore = defineStore('preferences', {
     typewriter: false, // typewriter mode
     focus: false,
     sourceCode: false, // source code mode
-    preview: false, // split source + live preview mode
+    // Split source + live preview is the default display mode for opened files.
+    preview: true,
 
     // user configration
     imageFolderPath: '',
@@ -269,9 +270,26 @@ export const usePreferencesStore = defineStore('preferences', {
       ;(this as unknown as Record<string, unknown>)[type as string] = checked
     },
 
-    TOGGLE_VIEW_MODE(entryName: keyof PreferencesState | string): void {
+    TOGGLE_VIEW_MODE(entryName: keyof PreferencesState | string): Record<string, unknown> {
       const target = this as unknown as Record<string, unknown>
-      target[entryName as string] = !target[entryName as string]
+      const name = entryName as string
+      const checked = !target[name]
+      target[name] = checked
+
+      const changes: Record<string, unknown> = { [name]: checked }
+
+      // Full source-code mode and split preview both drive the CodeMirror
+      // surface, so keep them mutually exclusive. Otherwise toggling source-code
+      // mode while preview is active has no visible effect.
+      if (checked && name === 'sourceCode') {
+        target.preview = false
+        changes.preview = false
+      } else if (checked && name === 'preview') {
+        target.sourceCode = false
+        changes.sourceCode = false
+      }
+
+      return changes
     },
 
     ASK_FOR_USER_PREFERENCE(): void {
@@ -313,19 +331,16 @@ export const usePreferencesStore = defineStore('preferences', {
         bus.emit('show-command-palette')
       })
       window.electron.ipcRenderer.on('mt::toggle-view-mode-entry', (_event, entryName) => {
-        this.TOGGLE_VIEW_MODE(entryName)
-        const target = this as unknown as Record<string, unknown>
-        this.DISPATCH_EDITOR_VIEW_STATE({ [entryName]: target[entryName] })
+        const changes = this.TOGGLE_VIEW_MODE(entryName)
+        this.DISPATCH_EDITOR_VIEW_STATE(changes)
       })
     },
 
     // Toggle a view option and notify main process to toggle menu item.
     LISTEN_TOGGLE_VIEW(): void {
       bus.on('view:toggle-view-entry', (entryName) => {
-        const name = entryName as string
-        this.TOGGLE_VIEW_MODE(name)
-        const target = this as unknown as Record<string, unknown>
-        this.DISPATCH_EDITOR_VIEW_STATE({ [name]: target[name] })
+        const changes = this.TOGGLE_VIEW_MODE(entryName as string)
+        this.DISPATCH_EDITOR_VIEW_STATE(changes)
       })
     },
 
